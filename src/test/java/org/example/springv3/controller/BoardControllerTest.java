@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.example.springv3.board.BoardRequest;
 import org.example.springv3.core.util.JwtUtil;
 import org.example.springv3.user.User;
-import org.example.springv3.user.UserRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +15,9 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Transactional;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @Transactional // 컨트롤러에서 메서드가 실행되고 종료될 때 롤밷됨
 @AutoConfigureMockMvc
@@ -29,7 +30,7 @@ public class BoardControllerTest {
     private String accessToken;
 
     @BeforeEach
-    public void setUp(){
+    public void setUp() {
         System.out.println("나 실행돼? setUp");
         User sessionUser = User.builder().id(1).username("ssar").build();
         accessToken = JwtUtil.create(sessionUser);
@@ -59,5 +60,28 @@ public class BoardControllerTest {
         actions.andExpect(jsonPath("$.status").value(200));
         actions.andExpect(jsonPath("$.msg").value("성공"));
         actions.andExpect(jsonPath("$.body.id").value(11));
+    }
+
+    @Test
+    public void delete_test() throws Exception {
+        // given
+        int id = 2;
+
+        // when
+        ResultActions actions = mvc.perform(
+                delete("/api/board/"+id)
+                        .header("Authorization", "Bearer " + accessToken)
+        );
+
+        // eye
+        String responseBody = actions.andReturn().getResponse().getContentAsString();
+        System.out.println(responseBody);
+
+        // then
+        actions.andExpect(status().isOk());
+        //actions.andExpect(jsonPath("$.msg").value("성공"));
+        //actions.andExpect(jsonPath("$.body").isEmpty());
+
+
     }
 }
