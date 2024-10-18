@@ -19,7 +19,7 @@ public class FilterConfig {
     public FilterRegistrationBean<?> corsFilter(){
         FilterRegistrationBean<CorsFilter> bean
                 = new FilterRegistrationBean<>(new CorsFilter());
-        bean.addUrlPatterns("/api/*");
+        bean.addUrlPatterns("/*");
         bean.setOrder(0);
         return bean;
     }
@@ -29,7 +29,7 @@ public class FilterConfig {
         FilterRegistrationBean<JwtAuthorizationFilter> bean
                 = new FilterRegistrationBean<>(new JwtAuthorizationFilter());
         bean.addUrlPatterns("/api/*");
-        bean.setOrder(0);
+        bean.setOrder(1);
         return bean;
     }
 }
